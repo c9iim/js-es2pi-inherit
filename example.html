@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <title>example of js-es2pi-inherit</title>
+</head>
+
+<body>
+    <p>See console.</p>
+    <script src="https://raw.githubusercontent.com/dankogai/js-es2pi/master/es2pi.min.js"></script>
+    <script src="es2pi-inherit.js"></script>
+    <script>
+    (function(global) {
+        var parent = {name:"dankogai", lang:"javascript"};
+        var child = Object.inherit(parent, {name:"mii"});
+        var extension = Object.extend(child, {lang:"fluidchainjs"});
+        console.log(parent); // {"name":"dankogai", "lang":"javascript"}
+        console.log(child); // {"name":"mii", "lang":"fluidchainjs"}
+        console.log(extension); // {"name":"mii", "lang":"fluidchainjs"}
+        console.log(child.parent()); // undefined
+    })(this);
+    (function(global) {
+        var parent = {name:"dankogai", lang:"javascript"};
+        var child = Object.inherit2(parent, {name:"mii"});
+        var extension = Object.extend2(child, {lang:"fluidchainjs"});
+        Object.extend(parent, {lang:"rust"});
+        console.log(parent); // {"name":"dankogai", "lang":"rust"}
+        console.log(child); // {"name":"mii", "lang":"javascript"}
+        console.log(extension); // {"name":"mii", "lang":"fluidchainjs"}
+        console.log(child.parent()); // {name:"dankogai", lang:"javascript"}
+    })(this);
+    </script>
+</body>
+
+</html>
