@@ -28,11 +28,9 @@ console.log(child.parent()); // {name:"dankogai", lang:"javascript"}
 REQUIREMENT
 -----------
 
-EcmaScript 5 compliance.
++ EcmaScript 5 compliance.
++ https://github.com/dankogai/js-es2pi
 
 See Also
 --------
 + https://github.com/dankogai/js-es2pi
-+ http://wiki.ecmascript.org/doku.php?id=harmony:proposals
-+ https://wiki.mozilla.org/ES6_plans
-+ http://kangax.github.com/es5-compat-table/es6/
