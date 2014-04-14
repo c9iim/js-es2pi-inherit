@@ -13,7 +13,7 @@
  *  http://www.opensource.org/licenses/mit-license
  *
  */
-(function(root){
+(function(root) {
     'use strict';
     var O = Object;
     var OP = O.prototype;
@@ -31,15 +31,16 @@
         return hasOwnProperty.call(o, k);
     };
     var defaultProperty = function(target, prop, desc) {
-        return has(target, prop) 
-            ? false : installProperty(target, prop, desc);
+        return has(target, prop) ? false : installProperty(target, prop, desc);
     };
     var defaultProperties = function(target, descs) {
         getOwnPropertyNames(descs)
-            .filter(function(k) {return k !== nameOfSafe})
+            .filter(function(k) {
+                return k !== nameOfSafe;
+            })
             .forEach(function(name) {
                 defaultProperty(target, name, descs[name]);
-        });
+            });
         return target;
     };
     var obj2specs = function(src) {
@@ -54,34 +55,31 @@
         });
         return specs;
     };
+    // extend
     function extend2(dst, src) {
         var f;
-        function F(){}
+        function F() {}
         F.prototype = dst;
         f = extend(new F(), src);
-        defineProperty(f, '__parent__', {
-            enumerable: false,
-            configurable: false,
-            writable: false,
-            value: dst
-        });
         return f;
-    };
+    }
+    // inherit
     function inherit(dst, src) {
         return extend(clone(dst, true), src);
-    };
+    }
     function inherit2(dst, src) {
         return extend2(clone(dst, true), src);
-    };
-    function parent() {
-        return this.__parent__;
-    };
+    }
+    // prototype
+    function previous() {
+        return getPrototypeOf(this);
+    }
     defaultProperties(O, obj2specs({
         extend2: extend2,
         inherit: inherit,
         inherit2: inherit2
     }));
     defaultProperties(OP, obj2specs({
-        parent: parent
+        previous: previous
     }));
 })(this);
