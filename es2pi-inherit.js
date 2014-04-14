@@ -22,7 +22,9 @@
     var clone = O.clone;
     var installProperty = O.installProperty;
     var getOwnPropertyNames = O.getOwnPropertyNames;
+    var getPrototypeOf = O.getPrototypeOf;
     var defineProperty = O.defineProperty;
+    var toString = OP.toString;
     var hasOwnProperty = ''.hasOwnProperty;
     var nameOfSafe = '__previousProperties__';
     // exported functions: function public(...){...}
@@ -55,6 +57,40 @@
         });
         return specs;
     };
+    // relationships
+    function buildRelationships(obj) {
+        getOwnPropertyNames(obj)
+            .filter(function(k) {
+                return k !== nameOfSafe;
+            })
+            .forEach(function(name) {
+                var type = toString.call(obj[name]);
+                if (type === '[object Object]' || type === '[object Array]') {
+                    buildRelationships(obj[name]);
+                    defineProperty(obj[name], '__parent__', {
+                        value: obj,
+                        configurable: true,
+                        writable: false,
+                        enumerable: false
+                    });
+                }
+            });
+        return obj;
+    }
+    function eraseRelationships(obj) {
+        getOwnPropertyNames(obj)
+            .filter(function(k) {
+                return k !== nameOfSafe;
+            })
+            .forEach(function(name) {
+                var type = toString.call(obj[name]);
+                if (type === '[object Object]' || type === '[object Array]') {
+                    delete obj[name].__parent__;
+                    eraseRelationships(obj[name]);
+                }
+            });
+        return obj;
+    }
     // extend
     function extend2(dst, src) {
         var f;
@@ -71,15 +107,21 @@
         return extend2(clone(dst, true), src);
     }
     // prototype
+    function parent() {
+        return this.__parent__;
+    }
     function previous() {
         return getPrototypeOf(this);
     }
     defaultProperties(O, obj2specs({
+        buildRelationships: buildRelationships,
+        eraseRelationships: eraseRelationships,
         extend2: extend2,
         inherit: inherit,
         inherit2: inherit2
     }));
     defaultProperties(OP, obj2specs({
+        parent: parent,
         previous: previous
     }));
 })(this);
