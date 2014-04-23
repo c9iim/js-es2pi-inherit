@@ -59,38 +59,48 @@
         return specs;
     };
     // relationships
-    function buildRelationships(obj) {
-        getOwnPropertyNames(obj)
-            .filter(function(k) {
-                return k !== nameOfSafe;
-            })
-            .forEach(function(name) {
-                var type = toString.call(obj[name]);
-                if (type === '[object Object]' || type === '[object Array]') {
-                    buildRelationships(obj[name]);
-                    defineProperty(obj[name], nameOfParent, {
-                        value: obj,
-                        configurable: true,
-                        writable: false,
-                        enumerable: false
-                    });
-                }
-            });
-        return obj;
+    function buildRelationships(obj, namesOfSkip) {
+        var rgx;
+        namesOfSkip = namesOfSkip ? [nameOfSafe, nameOfParent].concat(namesOfSkip) : [nameOfSafe, nameOfParent];
+        rgx = new RegExp(namesOfSkip.join('|'));
+        return (function _buildRelationships(o) {
+            getOwnPropertyNames(o)
+                .filter(function(k) {
+                    return !k.match(rgx);
+                })
+                .forEach(function(n) {
+                    var t = toString.call(o[n]);
+                    if (t === '[object Object]' || t === '[object Array]') {
+                        _buildRelationships(o[n]);
+                        defineProperty(o[n], nameOfParent, {
+                            value: o,
+                            configurable: true,
+                            writable: false,
+                            enumerable: false
+                        });
+                    }
+                });
+            return o;
+        })(obj);
     }
-    function eraseRelationships(obj) {
-        getOwnPropertyNames(obj)
-            .filter(function(k) {
-                return k !== nameOfSafe;
-            })
-            .forEach(function(name) {
-                var type = toString.call(obj[name]);
-                if (type === '[object Object]' || type === '[object Array]') {
-                    delete obj[name][nameOfParent];
-                    eraseRelationships(obj[name]);
-                }
-            });
-        return obj;
+    function eraseRelationships(obj, namesOfSkip) {
+        var rgx;
+        namesOfSkip = namesOfSkip ? [nameOfSafe].concat(namesOfSkip) : [nameOfSafe];
+        rgx = new RegExp(namesOfSkip.join('|'));
+        return (function _eraseRelationships(o) {
+            getOwnPropertyNames(o)
+                .filter(function(k) {
+                    return !k.match(rgx);
+                })
+                .forEach(function(n) {
+                    var t = toString.call(o[n]);
+                    if (t === '[object Object]' || t === '[object Array]') {
+                        delete o[n][nameOfParent];
+                        _eraseRelationships(o[n]);
+                    }
+                });
+            return o;
+        })(obj, rgx);
     }
     // extend
     function extend2(dst, src) {
