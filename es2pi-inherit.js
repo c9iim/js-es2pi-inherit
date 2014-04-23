@@ -27,6 +27,7 @@
     var toString = OP.toString;
     var hasOwnProperty = ''.hasOwnProperty;
     var nameOfSafe = '__previousProperties__';
+    var nameOfParent = '__parent__';
     // exported functions: function public(...){...}
     // private  functions: var private = function(...){...}
     var has = function(o, k) {
@@ -67,7 +68,7 @@
                 var type = toString.call(obj[name]);
                 if (type === '[object Object]' || type === '[object Array]') {
                     buildRelationships(obj[name]);
-                    defineProperty(obj[name], '__parent__', {
+                    defineProperty(obj[name], nameOfParent, {
                         value: obj,
                         configurable: true,
                         writable: false,
@@ -85,7 +86,7 @@
             .forEach(function(name) {
                 var type = toString.call(obj[name]);
                 if (type === '[object Object]' || type === '[object Array]') {
-                    delete obj[name].__parent__;
+                    delete obj[name][nameOfParent];
                     eraseRelationships(obj[name]);
                 }
             });
@@ -108,7 +109,7 @@
     }
     // prototype
     function parent() {
-        return this.__parent__;
+        return this[nameOfParent];
     }
     function previous() {
         return getPrototypeOf(this);
